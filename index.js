@@ -20,6 +20,7 @@ const watchInterval = nconf.get('watchInterval')
 let lastChainInfo = null
 let nextSyncBlock = nconf.get('initialBlock')
 let isSyncing = true
+let lastBlock = 0;
 
 const mainLoop = async () => {
 
@@ -28,6 +29,13 @@ const mainLoop = async () => {
 
   const currentBlock = nextSyncBlock
   logger.info(`Syncing block ${currentBlock}`)
+
+  if (lastBlock === currentBlock) {
+    logger.info(`Detected block loop, restarting`)
+    process.exit(0)
+  } else {
+    lastBlock = currentBlock
+  }
 
   try {
     if (lastChainInfo == null || nextSyncBlock <= lastChainInfo.head_block_num) {
